@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Wazo from '@wazo/sdk/lib/simple';
 import {
   Text,
   Link,
@@ -12,13 +13,12 @@ import {
   VStack,
   Code,
 } from "native-base";
-import NativeBaseIcon from "./components/NativeBaseIcon";
+import NativeBaseIcon from "./src/components/NativeBaseIcon";
 
-import Main from './components/Main';
-import Login from './components/Login';
-import Settings from './components/Settings';
-import { WazoProvider, LOGIN, SETTINGS, MAIN } from './hooks/useWazo';
-import Wazo from '@wazo/sdk/lib/simple';
+import Main from './src/components/Main';
+import Login from './src/components/Login';
+import Settings from './src/components/Settings';
+import { WazoProvider, LOGIN, SETTINGS, MAIN } from './src/hooks/useWazo';
 
 // Define the config
 const config = {

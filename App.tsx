@@ -1,19 +1,9 @@
 import React, { useState } from "react";
 import Wazo from '@wazo/sdk/lib/simple';
 import {
-  Text,
-  Link,
-  HStack,
-  Center,
-  Heading,
-  Switch,
-  useColorMode,
   NativeBaseProvider,
   extendTheme,
-  VStack,
-  Code,
 } from "native-base";
-import NativeBaseIcon from "./src/components/NativeBaseIcon";
 
 import Main from './src/components/Main';
 import Login from './src/components/Login';

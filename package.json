@@ -19,21 +19,40 @@
       {
         "from": "dist/main/",
         "to": "./",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       },
       {
         "from": "dist/renderer",
         "to": "./",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       },
       "package.json",
       "**/node_modules/**/*"
+    ]
+  },
+  "iohook": {
+    "targets": [
+      "node-73",
+      "electron-73"
+    ],
+    "platforms": [
+      "win32",
+      "darwin"
+    ],
+    "arches": [
+      "x64",
+      "ia32"
     ]
   },
   "dependencies": {
     "@wazo/sdk": "^0.36.1",
     "expo": "~42.0.1",
     "expo-status-bar": "~1.0.4",
+    "iohook": "^0.9.3",
     "native-base": "3.2.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
@@ -46,11 +65,11 @@
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
-    "electron": "^6.0.12",
     "@expo/electron-adapter": "^0.0.55",
     "@expo/webpack-config": "^0.16.0",
     "@types/react": "~16.9.35",
     "@types/react-native": "~0.63.2",
+    "electron": "^6.0.12",
     "electron-builder": "^22.11.7",
     "typescript": "~4.0.0"
   },

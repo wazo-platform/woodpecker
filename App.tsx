@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
 import Wazo from '@wazo/sdk/lib/simple';
 
+Wazo.Auth.init('woodpecker');
+
 export default function App() {
   const [session, setSession] = useState('');
   const [username, setUsername] = useState('');

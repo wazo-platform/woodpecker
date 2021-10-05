@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Wazo from '@wazo/sdk/lib/simple';
-import electron from 'electron';
 import {
   NativeBaseProvider,
   extendTheme,
@@ -22,12 +21,16 @@ export const theme = extendTheme({ config });
 
 Wazo.Auth.init('woodpecker');
 
-electron.ipcRenderer.on('electron-keyup', (event, message) => {
-  console.log('electron-keyup', message);
-});
-electron.ipcRenderer.on('electron-keydown', (event, message) => {
-  console.log('electron-keydown', message);
-});
+if (window.require) {
+  const electron = require('electron');
+  electron.ipcRenderer.on('electron-keyup', (event, message) => {
+    console.log('electron-keyup', message);
+  });
+  electron.ipcRenderer.on('electron-keydown', (event, message) => {
+    console.log('electron-keydown', message);
+  });
+}
+
 
 export default function App() {
   const [page, setPage] = useState(LOGIN);

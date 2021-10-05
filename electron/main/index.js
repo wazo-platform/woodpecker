@@ -13,10 +13,6 @@ function createMainWindow() {
   const browserWindow = new BrowserWindow({ webPreferences: { nodeIntegration: true } });
 
   if (isDevelopment) {
-    browserWindow.webContents.openDevTools();
-  }
-
-  if (isDevelopment) {
     browserWindow.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`);
   } else {
     browserWindow.loadURL(
@@ -30,13 +26,6 @@ function createMainWindow() {
 
   browserWindow.on('closed', () => {
     mainWindow = null;
-  });
-
-  browserWindow.webContents.on('devtools-opened', () => {
-    browserWindow.focus();
-    setImmediate(() => {
-      browserWindow.focus();
-    });
   });
 
   return browserWindow;

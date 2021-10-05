@@ -1,19 +1,18 @@
 import React from "react";
 import {
   Text,
-  Link,
   HStack,
   Center,
   Heading,
   Switch,
   useColorMode,
-  NativeBaseProvider,
-  extendTheme,
   VStack,
-  Code,
+  Button,
 } from "native-base";
+import useWazo from "../hooks/useWazo";
 
 const Main = () => {
+  const { goMain } = useWazo()
   return (
     <Center
         _dark={{ bg: "blueGray.900" }}
@@ -24,6 +23,7 @@ const Main = () => {
         <VStack space={5} alignItems="center">
           <Heading size="lg">Settings</Heading>
           <ToggleDarkMode />
+          <Button onPress={goMain}>Back to Main</Button>
         </VStack>
       </Center>
   );

@@ -1,6 +1,6 @@
 'use strict';
 
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, globalShortcut } from 'electron';
 import * as path from 'path';
 import { format as formatUrl } from 'url';
 
@@ -9,7 +9,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
 let mainWindow;
 
-function createMainWindow() {
+const createMainWindow = () => {
   const browserWindow = new BrowserWindow({ webPreferences: { nodeIntegration: true } });
 
   if (isDevelopment) {
@@ -28,6 +28,10 @@ function createMainWindow() {
     mainWindow = null;
   });
 
+  const ret = globalShortcut.register('CommandOrControl+K', () => {
+    console.log('CommandOrControl+K is pressed')
+  })
+
   return browserWindow;
 }
 
@@ -38,6 +42,11 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+
+app.on('will-quit', () => {
+  // Unregister all shortcuts.
+  globalShortcut.unregisterAll();
+})
 
 app.on('activate', () => {
   // on macOS it is common to re-create a window even after all windows have been closed

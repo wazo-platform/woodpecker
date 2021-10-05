@@ -18,6 +18,7 @@ import Main from './components/Main';
 import Login from './components/Login';
 import Settings from './components/Settings';
 import { WazoProvider, LOGIN, SETTINGS, MAIN } from './hooks/useWazo';
+import Wazo from '@wazo/sdk/lib/simple';
 
 // Define the config
 const config = {

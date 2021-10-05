@@ -1,11 +1,14 @@
 import React from "react";
 import {
+  Button,
   Center,
   Heading,
   VStack,
 } from "native-base";
+import useWazo from "../hooks/useWazo";
 
 const Main = () => {
+  const { goSettings, logout } = useWazo();
   return (
     <Center
         _dark={{ bg: "blueGray.900" }}
@@ -15,6 +18,8 @@ const Main = () => {
       >
         <VStack space={5} alignItems="center">
           <Heading size="lg">Main</Heading>
+          <Button onPress={goSettings}>Settings</Button>
+          <Button onPress={logout}>Logout</Button>
         </VStack>
       </Center>
   );

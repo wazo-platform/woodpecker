@@ -11,18 +11,35 @@ type LoginInput = {
   username: string,
   password: string, 
   server: string,
-}
+};
+
+type WazoContextType = {
+  page: string,
+  setPage: Function,
+  login: Function, 
+  username: string,
+  server: string,
+};
 
 export const WazoProvider = ({ value: { page, setPage }, children }) => {
   const [{ username, password, server }, setState] = useSetState({});
+  const goSettings = () => setPage(SETTINGS);
+  const goMain = () => setPage(MAIN);
+  const goLogin = () => setPage(LOGIN);
 
   const login = (loginInput: LoginInput) => {
     setState(loginInput);
-    setPage(MAIN)
+    goMain();
+  };
+
+  const logout = () => {
+    goLogin();
   }
+
+  const value = { page, setPage, login, logout, username, server, goSettings, goMain };
  
   return (
-    <WazoContext.Provider value={{ page, setPage, login, username, server }}>
+    <WazoContext.Provider value={value}>
       {children}
     </WazoContext.Provider>
   );

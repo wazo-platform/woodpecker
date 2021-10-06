@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext, createContext } from 'react';
 import { useColorMode } from 'native-base';
 
-
 import useSetState from './useSetState';
 import { getStoredValue, removeStoredValue, storeValue } from '../utils';
 
@@ -71,8 +70,8 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
   };
 
-  const onLogin = () => {
-    const storedRoom = getStoredValue('room');
+  const onLogin = async () => {
+    const storedRoom = await getStoredValue('room');
     if (storedRoom) {
       setRoom(storedRoom);
     }

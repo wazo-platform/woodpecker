@@ -9,7 +9,7 @@ import Main from './src/components/Main';
 import Login from './src/components/Login';
 import Settings from './src/components/Settings';
 import { WazoProvider, LOGIN, SETTINGS, MAIN } from './src/hooks/useWazo';
-import {storeValue} from "./src/utils";
+import { storeValue } from "./src/utils";
 
 // Define the config
 const config = {

@@ -14,7 +14,6 @@ import useWazo from "../hooks/useWazo";
 
 const Main = () => {
   const { goMain, room, rooms, onRoomChange, colorMode, toggleColorMode } = useWazo();
-  console.log(colorMode)
   return (
     <Center
         _dark={{ bg: "blueGray.900" }}
@@ -24,7 +23,7 @@ const Main = () => {
       >
         <VStack space={5} alignItems="center">
           <Heading size="lg">Settings</Heading>
-          
+
           <HStack space={2} alignItems="center">
             <Text>Dark</Text>
             <Switch
@@ -39,7 +38,7 @@ const Main = () => {
             />
             <Text>Light</Text>
           </HStack>
-          
+
           <Select
             selectedValue={room}
             minWidth="200"

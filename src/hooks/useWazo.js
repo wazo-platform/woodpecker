@@ -92,11 +92,11 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
 
   const redirectExistingSession = async (server, token) => {
     Wazo.Auth.setHost(server)
-    const refreshToken = getStoredValue('refreshToken');
+    const refreshToken = await getStoredValue('refreshToken');
     try {
       const existingSession = await Wazo.Auth.validateToken(token, refreshToken);
       if (!existingSession) {
-        throw new Error('Empty session');
+        return;
       }
       setSession(existingSession);
     } catch (error) {

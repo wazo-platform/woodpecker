@@ -1,12 +1,37 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Center,
   Heading,
   VStack,
   Input,
   Button,
-} from "native-base";
-import useWazo from "../hooks/useWazo";
+} from 'native-base';
+import useWazo from '../hooks/useWazo';
+
+const audio = document.createElement('audio');
+audio.src = require('../../assets/silence.mp3');
+audio.loop = true;
+
+// Browser not focused
+if (navigator.mediaSession) {
+  navigator.mediaSession.setActionHandler('play', async function() {
+    console.log('> User clicked "Play" icon.');
+    await audio.play();
+  });
+
+  navigator.mediaSession.setActionHandler('pause', function() {
+    console.log('> User clicked "Pause" icon.');
+    audio.pause();
+  });
+
+  audio.addEventListener('play', function() {
+    navigator.mediaSession.playbackState = 'playing';
+  });
+
+  audio.addEventListener('pause', function() {
+    navigator.mediaSession.playbackState = 'paused';
+  });
+}
 
 const Main = () => {
   const [username, setUsername] = useState('');
@@ -16,6 +41,8 @@ const Main = () => {
 
   const onPress = () => {
     login({ username, password, server });
+
+    audio.play().catch(error => console.log(error));
   }
 
   return (

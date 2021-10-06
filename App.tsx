@@ -21,6 +21,7 @@ export const theme = extendTheme({ config });
 
 Wazo.Auth.init('woodpecker');
 
+// Electron
 if (window.require) {
   const electron = require('electron');
   electron.ipcRenderer.on('electron-keyup', (event, message) => {
@@ -30,7 +31,6 @@ if (window.require) {
     console.log('electron-keydown', message);
   });
 }
-
 
 export default function App() {
   const [page, setPage] = useState(LOGIN);

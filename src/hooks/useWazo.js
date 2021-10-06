@@ -28,7 +28,7 @@ type WazoContextType = {
 export const WazoProvider = ({ value: { page, setPage }, children }) => {
   const [{ username, password, server, colorMode }, setState] = useSetState({});
 
-  const [room, setRoom] = useState('');
+  const [roomId, setRoomId] = useState('');
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
   const [session, setSession] = useState(null);
@@ -38,7 +38,7 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
       console.log('acquiring rooms...');
       const source = await Wazo.getApiClient().dird.fetchConferenceSource(session.primaryContext());
       const newRooms = await Wazo.getApiClient().dird.fetchConferenceContacts(source.items[0]);
-      const formattedRooms = newRooms.map(contact => ({ label: contact.name, id: contact.sourceId }));
+      const formattedRooms = newRooms.map(contact => ({ label: contact.name, id: `${contact.sourceId}` }));
       setRooms(formattedRooms);
     }
     setPage(SETTINGS);
@@ -71,12 +71,12 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
   };
 
   const onLogin = () => {
-    const storedRoom = getStoredValue('room');
-    if (storedRoom) {
-      setRoom(storedRoom);
+    const storedRoomId = getStoredValue('room');
+    if (storedRoomId) {
+      setRoomId(storedRoomId);
     }
 
-    if (!storedRoom) {
+    if (!storedRoomId) {
       goSettings();
       return;
     }
@@ -105,7 +105,7 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
   }
 
-  const onRoomChange = newRoom => setRoom(newRoom);
+  const onRoomChange = newRoomId => setRoomId(newRoomId);
 
   useEffect(() => {
     if (colorMode) {
@@ -115,10 +115,10 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
   }, [colorMode])
 
   useEffect(() => {
-    if (room) {
-      storeValue('room', room);
+    if (roomId) {
+      storeValue('roomId', roomId);
     }
-  }, [room])
+  }, [roomId])
 
   useEffect(() => {
     if (session) {
@@ -126,7 +126,7 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
   }, [session])
 
-  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, room, onRoomChange, loading, colorMode, setState };
+  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, roomId, onRoomChange, loading, colorMode, setState };
 
   return (
     <WazoContext.Provider value={value}>

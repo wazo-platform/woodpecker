@@ -14,7 +14,7 @@ import {
 import useWazo from "../hooks/useWazo";
 
 const Main = () => {
-  const { goMain, room, rooms, onRoomChange, setState } = useWazo();
+  const { goMain, roomId, rooms, onRoomChange, setState } = useWazo();
   const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Center
@@ -42,7 +42,7 @@ const Main = () => {
           </HStack>
           
           <Select
-            selectedValue={room}
+            selectedValue={roomId}
             minWidth="200"
             placeholder="Choose room"
             _selectedItem={{

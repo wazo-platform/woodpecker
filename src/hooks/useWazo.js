@@ -26,7 +26,17 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
   const [room, setRoom] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
-  const goSettings = () => setPage(SETTINGS);
+  const [session, setSession] = useState(null);
+
+  const goSettings = async () => {
+    if (!rooms?.length) {
+      console.log('acquiring rooms...');
+      const source = await Wazo.getApiClient().dird.fetchConferenceSource(session.primaryContext());
+      const newRooms = await Wazo.getApiClient().dird.fetchConferenceContacts(source.items[0]);
+      setRooms(newRooms);
+    }
+    setPage(SETTINGS);
+  }
   const goMain = () => setPage(MAIN);
   const goLogin = () => setPage(LOGIN);
 
@@ -38,19 +48,12 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
 
     try {
       const newSession = await Wazo.Auth.logIn(loginInput.username, loginInput.password);
+      setSession(newSession);
 
       localStorage.setItem('token', newSession.token);
       localStorage.setItem('refreshToken', newSession.refreshToken);
       localStorage.setItem('server', loginInput.server);
 
-      const newRooms = await new Promise(resolve => setTimeout(() => resolve([
-        { id: '1', label: 'Room 1' }, 
-        { id: '2', label: 'Room 2' }, 
-        { id: '3', label: 'Room 3' }, 
-        ]), 50)
-      );
-  
-      setRooms(newRooms);
       setLoading(false);
 
       goMain();
@@ -72,6 +75,7 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     const refreshToken = localStorage.getItem('refreshToken');
     try {
       const existingSession = await Wazo.Auth.validateToken(token, refreshToken);
+      setSession(existingSession);
       if (existingSession) {
         goMain();
       }

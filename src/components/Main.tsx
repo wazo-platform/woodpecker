@@ -83,12 +83,12 @@ const Main = () => {
         flex={1}
       >
         <VStack space={5} alignItems="center">
-          <Button isDisabled={disabled} onPressIn={() => setTalking(true)} onPressOut={() => setTalking(false)}>
+          <Button size="lg" isDisabled={disabled} onPressIn={() => setTalking(true)} onPressOut={() => setTalking(false)}>
             {talking ? 'Talking': 'Talk'}
           </Button>
         </VStack>
       </Center>
-      <HStack bg="indigo.600" alignItems="center" safeAreaBottom shadow={6}>
+      <HStack bg="indigo.600" justifyContent="right" safeAreaBottom shadow={6}>
         <Button variant="ghost" onPress={goSettings}>Settings</Button>
         <Button variant="ghost" onPress={onLogout}>Logout</Button>
       </HStack>

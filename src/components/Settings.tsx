@@ -35,7 +35,7 @@ const Main = () => {
               endIcon: <CheckIcon size="5" />,
             }}
             mt={1}
-            onValueChange={itemValue => onRoomChange(itemValue)}
+            onValueChange={onRoomChange}
           >
             {rooms.map(({ id, label }) => <Select.Item label={label} value={id} key={id} />)}
           </Select>

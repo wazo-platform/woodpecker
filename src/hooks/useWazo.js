@@ -26,8 +26,8 @@ type WazoContextType = {
 
 // Polyfill webrtc
 if (isMobile) {
-  const MediaStreamTrackEvent = require('react-native-webrtc/src/MediaStreamTrackEvent');
-  const MediaStreamTrack = require('react-native-webrtc/src/MediaStreamTrack');
+  const MediaStreamTrackEvent = require('react-native-webrtc/src/MediaStreamTrackEvent').default;
+  const MediaStreamTrack = require('react-native-webrtc/src/MediaStreamTrack').default;
   const { RTCPeerConnection, RTCSessionDescription, MediaStream, mediaDevices } = require('react-native-webrtc');
 
   global.MediaStream = MediaStream;
@@ -44,10 +44,7 @@ if (isMobile) {
     global.navigator = {};
   }
   global.MediaStreamTrackEvent = MediaStreamTrackEvent;
-
-  mediaDevices.enumerateDevices().then(sourceInfos => {
-    console.log('sourceInfos', sourceInfos);
-  });
+  console.log('MediaStreamTrackEvent', MediaStreamTrackEvent);
 }
 
 export const WazoProvider = ({ value: { page, setPage }, children }) => {

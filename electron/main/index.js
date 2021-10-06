@@ -3,7 +3,7 @@
 import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import { format as formatUrl } from 'url';
-import ioHook from 'iohook';
+// import ioHook from 'iohook';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -29,10 +29,10 @@ const createMainWindow = () => {
     mainWindow = null;
   });
 
-  ioHook.on('keyup', event => browserWindow.webContents.send('electron-keyup', event));
-  ioHook.on('keydown', event => browserWindow.webContents.send('electron-keydown', event));
-
-  ioHook.start();
+  // ioHook.on('keyup', event => browserWindow.webContents.send('electron-keyup', event));
+  // ioHook.on('keydown', event => browserWindow.webContents.send('electron-keydown', event));
+  //
+  // ioHook.start();
 
   return browserWindow;
 }
@@ -46,7 +46,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('will-quit', () => {
-  ioHook.stop();
+  // ioHook.stop();
 })
 
 app.on('activate', () => {

@@ -27,11 +27,7 @@ type WazoContextType = {
 
 export const WazoProvider = ({ value: { page, setPage }, children }) => {
   const [{ username, password, server }, setState] = useSetState({});
-  const { colorMode, toggleColorMode } = useColorMode();
-
-  setInterval(() => {
-    toggleColorMode()
-  }, 1000)
+  const { colorMode } = useColorMode();
 
   const [room, setRoom] = useState('');
   const [rooms, setRooms] = useState([]);
@@ -76,7 +72,12 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
   };
 
   const onLogin = () => {
-    if (!room) {
+    const storedRoom = getStoredValue('room');
+    if (storedRoom) {
+      setRoom(storedRoom);
+    }
+
+    if (!storedRoom) {
       goSettings();
       return;
     }
@@ -125,7 +126,7 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
   }, [session])
 
-  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, room, onRoomChange, loading, colorMode, toggleColorMode };
+  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, room, onRoomChange, loading, colorMode };
 
   return (
     <WazoContext.Provider value={value}>

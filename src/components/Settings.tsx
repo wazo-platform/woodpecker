@@ -9,11 +9,13 @@ import {
   Button,
   Select,
   CheckIcon,
+  useColorMode,
 } from "native-base";
 import useWazo from "../hooks/useWazo";
 
 const Main = () => {
-  const { goMain, room, rooms, onRoomChange, colorMode, toggleColorMode } = useWazo();
+  const { goMain, room, rooms, onRoomChange } = useWazo();
+  const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Center
         _dark={{ bg: "blueGray.900" }}

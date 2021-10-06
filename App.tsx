@@ -20,6 +20,8 @@ const config = async () => {
   }
 };
 
+export const theme = extendTheme({ config });
+
 Wazo.Auth.init('woodpecker', 10);
 Wazo.Auth.setOnRefreshToken((token: string) => {
   storeValue('token', token);

@@ -26,7 +26,7 @@ type WazoContextType = {
 };
 
 export const WazoProvider = ({ value: { page, setPage }, children }) => {
-  const [{ username, password, server, colorMode }, setState] = useSetState({});
+  const [{ username, password, server }, setState] = useSetState({});
 
   const [roomNumber, setRoomNumber] = useState('');
   const [rooms, setRooms] = useState([]);
@@ -55,7 +55,6 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     try {
       const newSession = await Wazo.Auth.logIn(loginInput.username, loginInput.password);
       setSession(newSession);
-
       storeValue('token', newSession.token);
       storeValue('refreshToken', newSession.refreshToken);
       storeValue('server', loginInput.server);
@@ -108,13 +107,6 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
   const onRoomChange = newRoomNumber => setRoomNumber(newRoomNumber);
 
   useEffect(() => {
-    if (colorMode) {
-      console.log('setting mode', colorMode);
-      storeValue('colorMode', colorMode);
-    }
-  }, [colorMode])
-
-  useEffect(() => {
     if (roomNumber) {
       storeValue('roomNumber', roomNumber);
     }
@@ -126,7 +118,7 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
   }, [session])
 
-  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, roomNumber, onRoomChange, loading, colorMode, setState };
+  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, roomNumber, onRoomChange, loading, setState };
 
   return (
     <WazoContext.Provider value={value}>

@@ -5,11 +5,16 @@ import {
   Heading,
   VStack,
 } from 'native-base';
+import Wazo from '@wazo/sdk/lib/simple';
+
 import useWazo from '../hooks/useWazo';
 import useShortcut from '../hooks/useShortcut';
 
+let room: Wazo.Room;
+
 const Main = () => {
-  const { goSettings, logout } = useWazo();
+  const { goSettings, logout, roomNumber } = useWazo();
+  const [ready, setReady] = useState(false);
   const [talking, setTalking] = useState(false);
   const keyDown = useShortcut('ctrl+j', talking);
 
@@ -21,6 +26,52 @@ const Main = () => {
     }
   }, [keyDown]);
 
+  useEffect(() => {
+    if (talking) {
+      room?.unmute();
+    } else {
+      room?.mute();
+    }
+  }, [talking]);
+
+  useEffect(() => {
+    (async () => {
+      room = await Wazo.Room.connect({ extension: roomNumber, constraints: { audio: true }, audioOnly: true });
+
+      room.on(room.ON_JOINED, () => {
+        room.mute();
+        setReady(true);
+      });
+    })();
+
+    window.addEventListener('beforeunload', (event) => {
+      if (room) {
+        event.preventDefault();
+        // $FlowFixMe
+        event.returnValue = '';
+
+        return true;
+      }
+
+      room?.disconnect();
+
+      // $FlowFixMe
+      delete event.returnValue;
+      return false;
+    });
+
+    window.addEventListener('unload', () => {
+      room?.disconnect();
+    });
+  }, []);
+
+  const onLogout = () => {
+    room?.disconnect();
+    logout();
+  }
+
+  const disabled = !ready;
+
   return (
     <Center
         _dark={{ bg: "blueGray.900" }}
@@ -31,10 +82,10 @@ const Main = () => {
         <VStack space={5} alignItems="center">
           <Heading size="lg">Main</Heading>
           <Button onPress={goSettings}>Settings</Button>
-          <Button onPressIn={() => setTalking(true)} onPressOut={() => setTalking(false)}>
+          <Button isDisabled={disabled} onPressIn={() => setTalking(true)} onPressOut={() => setTalking(false)}>
             {talking ? 'Talking': 'Talk'}
           </Button>
-          <Button onPress={logout}>Logout</Button>
+          <Button onPress={onLogout}>Logout</Button>
         </VStack>
       </Center>
   );

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext, createContext } from 'react';
 import { useColorMode } from 'native-base';
 
-
 import useSetState from './useSetState';
 import { getStoredValue, removeStoredValue, storeValue } from '../utils';
 

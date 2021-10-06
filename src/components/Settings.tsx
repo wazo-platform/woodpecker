@@ -11,7 +11,11 @@ import {
   CheckIcon,
   useColorMode,
   Box,
+  IconButton,
+  Icon,
 } from "native-base";
+import { AntDesign } from "@expo/vector-icons"
+
 import useWazo from "../hooks/useWazo";
 import { storeValue } from "../utils";
 
@@ -20,8 +24,12 @@ const Main = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Box flex={1} bg="white" safeAreaBottom>
-      <HStack bg="indigo.600" alignItems="center" safeAreaTop shadow={6}>
-        <Button variant="ghost" onPress={goMain}>Back</Button>
+      <HStack bg="indigo.600" alignItems="center" safeAreaTop shadow={6} style={{ height: 60 }}>
+        <IconButton
+          variant="ghost"
+          onPress={goMain}
+          icon={<Icon size="md" as={<AntDesign name="arrowleft" />} color="white" />}
+        />
       </HStack>
 
       <Center

@@ -1,8 +1,9 @@
 'use strict';
 
-import { app, BrowserWindow, globalShortcut } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import { format as formatUrl } from 'url';
+import ioHook from 'iohook';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -28,9 +29,10 @@ const createMainWindow = () => {
     mainWindow = null;
   });
 
-  const ret = globalShortcut.register('CommandOrControl+K', () => {
-    console.log('CommandOrControl+K is pressed')
-  })
+  ioHook.on('keyup', event => browserWindow.webContents.send('electron-keyup', event));
+  ioHook.on('keydown', event => browserWindow.webContents.send('electron-keydown', event));
+
+  ioHook.start();
 
   return browserWindow;
 }
@@ -44,8 +46,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('will-quit', () => {
-  // Unregister all shortcuts.
-  globalShortcut.unregisterAll();
+  ioHook.stop();
 })
 
 app.on('activate', () => {

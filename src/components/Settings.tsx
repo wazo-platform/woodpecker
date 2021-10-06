@@ -8,11 +8,13 @@ import {
   useColorMode,
   VStack,
   Button,
+  Select,
+  CheckIcon,
 } from "native-base";
 import useWazo from "../hooks/useWazo";
 
 const Main = () => {
-  const { goMain } = useWazo()
+  const { goMain, room, rooms, onRoomChange } = useWazo();
   return (
     <Center
         _dark={{ bg: "blueGray.900" }}
@@ -23,6 +25,21 @@ const Main = () => {
         <VStack space={5} alignItems="center">
           <Heading size="lg">Settings</Heading>
           <ToggleDarkMode />
+          
+          <Select
+            selectedValue={room}
+            minWidth="200"
+            placeholder="Choose room"
+            _selectedItem={{
+              bg: "teal.600",
+              endIcon: <CheckIcon size="5" />,
+            }}
+            mt={1}
+            onValueChange={itemValue => onRoomChange(itemValue)}
+          >
+            {rooms.map(({ id, label }) => <Select.Item label={label} value={id} key={id} />)}
+          </Select>
+
           <Button onPress={goMain}>Back to Main</Button>
         </VStack>
       </Center>

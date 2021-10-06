@@ -5,7 +5,6 @@ import {
   Center,
   Heading,
   Switch,
-  useColorMode,
   VStack,
   Button,
   Select,
@@ -14,7 +13,8 @@ import {
 import useWazo from "../hooks/useWazo";
 
 const Main = () => {
-  const { goMain, room, rooms, onRoomChange } = useWazo();
+  const { goMain, room, rooms, onRoomChange, colorMode, toggleColorMode } = useWazo();
+  console.log(colorMode)
   return (
     <Center
         _dark={{ bg: "blueGray.900" }}
@@ -24,7 +24,21 @@ const Main = () => {
       >
         <VStack space={5} alignItems="center">
           <Heading size="lg">Settings</Heading>
-          <ToggleDarkMode />
+          
+          <HStack space={2} alignItems="center">
+            <Text>Dark</Text>
+            <Switch
+              isChecked={colorMode === "light" ? false : true}
+              onToggle={() => {
+                console.log('clide', colorMode);
+                toggleColorMode()
+              }}
+              aria-label={
+                colorMode === "light" ? "switch to dark mode" : "switch to light mode"
+              }
+            />
+            <Text>Light</Text>
+          </HStack>
           
           <Select
             selectedValue={room}
@@ -43,24 +57,6 @@ const Main = () => {
           <Button onPress={goMain}>Back to Main</Button>
         </VStack>
       </Center>
-  );
-}
-
-// Color Switch Component
-function ToggleDarkMode() {
-  const { colorMode, toggleColorMode } = useColorMode();
-  return (
-    <HStack space={2} alignItems="center">
-      <Text>Dark</Text>
-      <Switch
-        isChecked={colorMode === "light" ? true : false}
-        onToggle={toggleColorMode}
-        aria-label={
-          colorMode === "light" ? "switch to dark mode" : "switch to light mode"
-        }
-      />
-      <Text>Light</Text>
-    </HStack>
   );
 }
 

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useContext, createContext } from 'react';
+import { useColorMode } from 'native-base';
+
 
 import useSetState from './useSetState';
 import { getStoredValue, removeStoredValue, storeValue } from '../utils';
@@ -25,6 +27,12 @@ type WazoContextType = {
 
 export const WazoProvider = ({ value: { page, setPage }, children }) => {
   const [{ username, password, server }, setState] = useSetState({});
+  const { colorMode, toggleColorMode } = useColorMode();
+
+  setInterval(() => {
+    toggleColorMode()
+  }, 1000)
+
   const [room, setRoom] = useState('');
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -99,14 +107,25 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
 
   const onRoomChange = newRoom => setRoom(newRoom);
 
-  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, room, onRoomChange, loading };
+  useEffect(() => {
+    if (colorMode) {
+      storeValue('colorMode', colorMode);
+    }
+  }, [colorMode])
 
+  useEffect(() => {
+    if (room) {
+      storeValue('room', room);
+    }
+  }, [room])
 
   useEffect(() => {
     if (session) {
       onLogin();
     }
   }, [session])
+
+  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, room, onRoomChange, loading, colorMode, toggleColorMode };
 
   return (
     <WazoContext.Provider value={value}>

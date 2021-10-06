@@ -12,7 +12,7 @@ import useWazo from '../hooks/useWazo';
 let audio = null;
 
 // Browser not focused
-if (document && navigator.mediaSession) {
+if (typeof document !== 'undefined' && navigator.mediaSession) {
   audio = document.createElement('audio');
   audio.src = require('../../assets/silence.mp3');
   audio.loop = true;

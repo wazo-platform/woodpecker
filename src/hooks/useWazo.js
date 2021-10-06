@@ -1,4 +1,6 @@
 import React, { useState, useContext, createContext } from 'react';
+
+import {getStoredValue, removeStoredValue, storeValue} from '../utils';
 import useSetState from './useSetState';
 
 export const LOGIN = 'page/LOGIN';
@@ -39,17 +41,17 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     try {
       const newSession = await Wazo.Auth.logIn(loginInput.username, loginInput.password);
 
-      localStorage.setItem('token', newSession.token);
-      localStorage.setItem('refreshToken', newSession.refreshToken);
-      localStorage.setItem('server', loginInput.server);
+      storeValue('token', newSession.token);
+      storeValue('refreshToken', newSession.refreshToken);
+      storeValue('server', loginInput.server);
 
       const newRooms = await new Promise(resolve => setTimeout(() => resolve([
-        { id: '1', label: 'Room 1' }, 
-        { id: '2', label: 'Room 2' }, 
-        { id: '3', label: 'Room 3' }, 
+        { id: '1', label: 'Room 1' },
+        { id: '2', label: 'Room 2' },
+        { id: '3', label: 'Room 3' },
         ]), 50)
       );
-  
+
       setRooms(newRooms);
       setLoading(false);
 
@@ -62,14 +64,14 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
+    removeStoredValue('token');
+    removeStoredValue('refreshToken');
     goLogin();
   }
 
   const redirectExistingSession = async (server, token) => {
     Wazo.Auth.setHost(server)
-    const refreshToken = localStorage.getItem('refreshToken');
+    const refreshToken = getStoredValue('refreshToken');
     try {
       const existingSession = await Wazo.Auth.validateToken(token, refreshToken);
       if (existingSession) {
@@ -84,7 +86,7 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
   const onRoomChange = newRoom => setRoom(newRoom);
 
   const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, room, onRoomChange, loading };
- 
+
   return (
     <WazoContext.Provider value={value}>
       {children}

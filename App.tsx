@@ -9,6 +9,7 @@ import Main from './src/components/Main';
 import Login from './src/components/Login';
 import Settings from './src/components/Settings';
 import { WazoProvider, LOGIN, SETTINGS, MAIN } from './src/hooks/useWazo';
+import {storeValue} from "./src/utils";
 
 // Define the config
 const config = {
@@ -20,10 +21,9 @@ const config = {
 export const theme = extendTheme({ config });
 
 Wazo.Auth.init('woodpecker', 10);
-Wazo.Auth.setOnRefreshToken((token:string) => { 
-  console.log('bonjour token');
-  localStorage.setItem('token', token);
- });
+Wazo.Auth.setOnRefreshToken((token:string) => {
+  storeValue('token', token);
+});
 
 export default function App() {
   const [page, setPage] = useState(LOGIN);

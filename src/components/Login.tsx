@@ -8,6 +8,7 @@ import {
   Text,
 } from 'native-base';
 import useWazo from '../hooks/useWazo';
+import { getStoredValue } from '../utils';
 
 const Main = () => {
   const [username, setUsername] = useState('');
@@ -20,8 +21,8 @@ const Main = () => {
   }
 
   useEffect(() => {
-    const server = localStorage.getItem('server');
-    const token = localStorage.getItem('token');
+    const server = getStoredValue('server');
+    const token = getStoredValue('token');
 
     if (server && token) {
       redirectExistingSession(server, token);

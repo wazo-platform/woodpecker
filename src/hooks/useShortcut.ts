@@ -18,13 +18,28 @@ if (typeof document !== 'undefined' && navigator.mediaSession) {
   audio.addEventListener('pause', onPause);
 }
 
-const useShortcut = (shortcut: string) => {
-  const [keyDown, setKeyDown] = useState(false);
+const useShortcut = (shortcut: string, status: boolean) => {
+  const [keyDown, setKeyDown] = useState(status);
+
+  useEffect(() => {
+    if (status) {
+      audio.play();
+    } else {
+      audio.pause();
+    }
+  }, [status]);
 
   useEffect(() => {
     // Browser
     if (audio) {
-      audio.play().catch(error => console.log(error));
+      const tryToPlay = setInterval(() => {
+        audio.play().then(() => {
+          if (!status) {
+            audio.pause();
+          }
+          clearInterval(tryToPlay);
+        }).catch(() => {});
+      }, 500);
 
       navigator.mediaSession.setActionHandler('play', async function() {
         setKeyDown(true);

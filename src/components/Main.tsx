@@ -52,22 +52,24 @@ const Main = () => {
       setRoom(newRoom);
     })();
 
-    window.addEventListener('beforeunload', (event) => {
-      if (room) {
-        event.preventDefault();
-        event.returnValue = '';
-        return true;
-      }
+    if (typeof window !== 'undefined' && window.addEventListener) {
+      window.addEventListener('beforeunload', (event) => {
+        if (room) {
+          event.preventDefault();
+          event.returnValue = '';
+          return true;
+        }
 
-      room?.disconnect();
+        room?.disconnect();
 
-      delete event.returnValue;
-      return false;
-    });
+        delete event.returnValue;
+        return false;
+      });
 
-    window.addEventListener('unload', () => {
-      room?.disconnect();
-    });
+      window.addEventListener('unload', () => {
+        room?.disconnect();
+      });
+    }
   }, []);
 
   const onLogout = () => {
@@ -94,7 +96,7 @@ const Main = () => {
           </Button>
         </VStack>
       </Center>
-      <HStack bg="indigo.600" justifyContent="right" alignItems="center" safeAreaBottom shadow={6} space="sm" style={{ height: 60}}>
+      <HStack bg="indigo.600" justifyContent="flex-end" alignItems="center" safeAreaBottom shadow={6} space="sm" style={{ height: 60}}>
         <IconButton
           variant="ghost"
           onPress={goSettings}

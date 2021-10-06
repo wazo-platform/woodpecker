@@ -22,6 +22,10 @@ const useShortcut = (shortcut: string, status: boolean) => {
   const [keyDown, setKeyDown] = useState(status);
 
   useEffect(() => {
+    if (!audio) {
+      return;
+    }
+
     if (status) {
       audio.play();
     } else {

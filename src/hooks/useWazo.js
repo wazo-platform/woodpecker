@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, createContext } from 'react';
 import { useColorMode } from 'native-base';
 
 import useSetState from './useSetState';
-import { getStoredValue, removeStoredValue, storeValue } from '../utils';
+import { getStoredValue, removeStoredValue, storeValue, isMobile } from '../utils';
 
 export const LOGIN = 'page/LOGIN';
 export const SETTINGS = 'page/SETTINGS';
@@ -23,6 +23,32 @@ type WazoContextType = {
   username: string,
   server: string,
 };
+
+// Polyfill webrtc
+if (isMobile) {
+  const MediaStreamTrackEvent = require('react-native-webrtc/src/MediaStreamTrackEvent');
+  const MediaStreamTrack = require('react-native-webrtc/src/MediaStreamTrack');
+  const { RTCPeerConnection, RTCSessionDescription, MediaStream, mediaDevices } = require('react-native-webrtc');
+
+  global.MediaStream = MediaStream;
+  global.MediaStreamTrack = MediaStreamTrack;
+  global.RTCSessionDescription = RTCSessionDescription;
+  global.RTCPeerConnection = RTCPeerConnection;
+  global.window.RTCPeerConnection = RTCPeerConnection;
+  if (global.navigator) {
+    global.navigator.mediaDevices = {
+      ...global.navigator.mediaDevices || {},
+      getUserMedia: mediaDevices.getUserMedia,
+    };
+  } else {
+    global.navigator = {};
+  }
+  global.MediaStreamTrackEvent = MediaStreamTrackEvent;
+
+  mediaDevices.enumerateDevices().then(sourceInfos => {
+    console.log('sourceInfos', sourceInfos);
+  });
+}
 
 export const WazoProvider = ({ value: { page, setPage }, children }) => {
   const [{ username, password, server }, setState] = useSetState({});

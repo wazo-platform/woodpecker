@@ -6,8 +6,11 @@ import {
   VStack,
   HStack,
   Box,
+  IconButton, 
+  Icon,
 } from 'native-base';
 import Wazo from '@wazo/sdk/lib/simple';
+import { AntDesign } from "@expo/vector-icons"
 
 import useWazo from '../hooks/useWazo';
 import useShortcut from '../hooks/useShortcut';
@@ -88,9 +91,17 @@ const Main = () => {
           </Button>
         </VStack>
       </Center>
-      <HStack bg="indigo.600" justifyContent="right" safeAreaBottom shadow={6}>
-        <Button variant="ghost" onPress={goSettings}>Settings</Button>
-        <Button variant="ghost" onPress={onLogout}>Logout</Button>
+      <HStack bg="indigo.600" justifyContent="right" alignItems="center" safeAreaBottom shadow={6} space="sm" style={{ height: 60}}>
+        <IconButton
+          variant="ghost"
+          onPress={goSettings}
+          icon={<Icon size="md" as={<AntDesign name="setting" />} color="white" />}
+        />
+        <IconButton
+          variant="ghost"
+          onPress={onLogout}
+          icon={<Icon size="md" as={<AntDesign name="logout" />} color="white" />}
+        />
       </HStack>
     </Box>
   );

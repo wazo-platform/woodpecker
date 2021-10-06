@@ -55,7 +55,7 @@ const Main = () => {
             {rooms.map(({ id, label }) => <Select.Item label={label} value={id} key={id} />)}
           </Select>
 
-          <Button onPress={goMain}>Back to Main</Button>
+          <Button onPress={goMain}>Back to Main ({roomId})</Button>
         </VStack>
       </Center>
   );

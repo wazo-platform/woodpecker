@@ -65,7 +65,7 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
 
       onLogin();
     } catch (error) {
-      console.error('Auts error', error);
+      console.error('Auth error', error);
       setLoading(false);
       return;
     }

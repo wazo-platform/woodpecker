@@ -54,7 +54,10 @@ function ToggleDarkMode() {
       <Text>Dark</Text>
       <Switch
         isChecked={colorMode === "light" ? true : false}
-        onToggle={toggleColorMode}
+        onToggle={()=> {
+          localStorage.setItem('colorMode', colorMode);
+          toggleColorMode();
+        }}
         aria-label={
           colorMode === "light" ? "switch to dark mode" : "switch to light mode"
         }

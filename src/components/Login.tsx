@@ -10,9 +10,10 @@ import {
 import useWazo from '../hooks/useWazo';
 
 const Main = () => {
+  const storedServer = localStorage.getItem('server') || '';
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [server, setServer] = useState('');
+  const [server, setServer] = useState(storedServer);
   const { login, loading, redirectExistingSession } = useWazo();
 
   const onPress = () => {
@@ -20,7 +21,6 @@ const Main = () => {
   }
 
   useEffect(() => {
-    const server = localStorage.getItem('server');
     const token = localStorage.getItem('token');
 
     if (server && token) {
@@ -28,7 +28,7 @@ const Main = () => {
     }
   }, []);
 
-
+  console.log(server);
   return (
     <Center
         _dark={{ bg: "blueGray.900" }}

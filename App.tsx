@@ -13,7 +13,7 @@ import { WazoProvider, LOGIN, SETTINGS, MAIN } from './src/hooks/useWazo';
 // Define the config
 const config = {
   useSystemColorMode: false,
-  initialColorMode: "dark",
+  initialColorMode: localStorage.getItem('colorMode') || 'dark',
 };
 
 // extend the theme
@@ -21,7 +21,6 @@ export const theme = extendTheme({ config });
 
 Wazo.Auth.init('woodpecker', 10);
 Wazo.Auth.setOnRefreshToken((token:string) => { 
-  console.log('bonjour token');
   localStorage.setItem('token', token);
  });
 
@@ -29,7 +28,7 @@ export default function App() {
   const [page, setPage] = useState(LOGIN);
   return (
     <WazoProvider value={{ page, setPage }}>
-      <NativeBaseProvider>
+      <NativeBaseProvider theme={theme}>
         {page === LOGIN && <Login />}
         {page === SETTINGS && <Settings />}
         {page === MAIN && <Main />}

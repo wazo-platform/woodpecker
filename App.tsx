@@ -10,26 +10,18 @@ import Main from './src/components/Main';
 import Login from './src/components/Login';
 import Settings from './src/components/Settings';
 import { WazoProvider, LOGIN, SETTINGS, MAIN } from './src/hooks/useWazo';
-import {storeValue, getStoredValue} from "./src/utils";
+import { getStoredValue, storeValue } from "./src/utils";
 
-export let theme;
-
-const setupTheme = async () => {
-  // Define the config
-  const initialColorMode = await getStoredValue('colorMode') || 'dark';
-  const config = {
+// Define the config
+const config = async () => {
+  return {
     useSystemColorMode: false,
-    initialColorMode,
-  };
-  
-  // extend the theme
-  theme = extendTheme({ config });
-}
-
-setupTheme();
+    initialColorMode: await getStoredValue('colorMode') || 'light',
+  }
+};
 
 Wazo.Auth.init('woodpecker', 10);
-Wazo.Auth.setOnRefreshToken((token:string) => {
+Wazo.Auth.setOnRefreshToken((token: string) => {
   storeValue('token', token);
 });
 

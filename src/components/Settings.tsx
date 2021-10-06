@@ -12,6 +12,7 @@ import {
   useColorMode,
 } from "native-base";
 import useWazo from "../hooks/useWazo";
+import { storeValue } from "../utils";
 
 const Main = () => {
   const { goMain, roomId, rooms, onRoomChange, setState } = useWazo();
@@ -30,9 +31,11 @@ const Main = () => {
             <Text>Dark</Text>
             <Switch
               isChecked={colorMode === "light" ? true : false}
-              onToggle={() => {
-                toggleColorMode()
-                setState({ colorMode: colorMode === 'light' ? 'dark' : 'light' })
+              onToggle={async () => {
+                if (colorMode) {
+                  await storeValue('colorMode', colorMode)
+                }
+                toggleColorMode();
               }}
               aria-label={
                 colorMode === "light" ? "switch to dark mode" : "switch to light mode"

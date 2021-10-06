@@ -27,14 +27,15 @@ const Main = () => {
   }
 
   useEffect(() => {
-    const server = getStoredValue('server');
-    const token = getStoredValue('token');
+    (async () => {
+      const server = await getStoredValue('server');
+      const token = await getStoredValue('token');
 
-    if (server && token) {
-      redirectExistingSession(server, token);
-    }
+      if (server && token) {
+        redirectExistingSession(server, token);
+      }
+    })();
   }, []);
-
 
   return (
     <Center _dark={dark} _light={light} px={4} flex={1}>
@@ -47,7 +48,7 @@ const Main = () => {
             variant="outline"
             placeholder="Username"
             value={username}
-            onChange={event => setUsername(event.target.value)}
+            onChangeText={setUsername}
             returnKeyLabel="next"
             returnKeyType="next"
         />
@@ -58,7 +59,7 @@ const Main = () => {
             placeholder="Password"
             type="password"
             value={password}
-            onChange={event => setPassword(event.target.value)}
+            onChangeText={setPassword}
             returnKeyLabel="next"
             returnKeyType="next"
         />
@@ -69,7 +70,7 @@ const Main = () => {
             placeholder="Server"
             value={server}
             keyboardType={isIOS ? 'url' : 'email-address'}
-            onChange={event => setServer(event.target.value)}
+            onChangeText={setServer}
             returnKeyLabel="send"
             returnKeyType="send"
         />

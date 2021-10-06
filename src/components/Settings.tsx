@@ -25,7 +25,7 @@ const Main = () => {
       >
         <VStack space={5} alignItems="center">
           <Heading size="lg">Settings</Heading>
-          
+
           <HStack space={2} alignItems="center">
             <Text>Dark</Text>
             <Switch
@@ -40,7 +40,7 @@ const Main = () => {
             />
             <Text>Light</Text>
           </HStack>
-          
+
           <Select
             selectedValue={roomId}
             minWidth="200"

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Center,
   Heading,
@@ -13,11 +13,21 @@ const Main = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [server, setServer] = useState('');
-  const { login, loading } = useWazo();
+  const { login, loading, redirectExistingSession } = useWazo();
 
   const onPress = () => {
     login({ username, password, server });
   }
+
+  useEffect(() => {
+    const server = localStorage.getItem('server');
+    const token = localStorage.getItem('token');
+
+    if (server && token) {
+      redirectExistingSession(server, token);
+    }
+  }, []);
+
 
   return (
     <Center

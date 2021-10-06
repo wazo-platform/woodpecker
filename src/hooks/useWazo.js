@@ -9,14 +9,14 @@ const WazoContext = createContext({});
 
 type LoginInput = {
   username: string,
-  password: string, 
+  password: string,
   server: string,
 };
 
 type WazoContextType = {
   page: string,
   setPage: Function,
-  login: Function, 
+  login: Function,
   username: string,
   server: string,
 };
@@ -34,34 +34,56 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     setState(loginInput);
     setLoading(true);
 
-    const success = await new Promise(resolve => setTimeout(() => resolve(true)), 2000);
+    Wazo.Auth.setHost(loginInput.server);
 
-    if (!success) {
-      console.error('handle authentication error');
+    try {
+      const newSession = await Wazo.Auth.logIn(loginInput.username, loginInput.password);
+
+      localStorage.setItem('token', newSession.token);
+      localStorage.setItem('refreshToken', newSession.refreshToken);
+      localStorage.setItem('server', loginInput.server);
+
+      const newRooms = await new Promise(resolve => setTimeout(() => resolve([
+        { id: '1', label: 'Room 1' }, 
+        { id: '2', label: 'Room 2' }, 
+        { id: '3', label: 'Room 3' }, 
+        ]), 50)
+      );
+  
+      setRooms(newRooms);
+      setLoading(false);
+
+      goMain();
+    } catch (error) {
+      console.error('Auts error', error);
       setLoading(false);
       return;
     }
-
-    const newRooms = await new Promise(resolve => setTimeout(() => resolve([
-      { id: '1', label: 'Room 1' }, 
-      { id: '2', label: 'Room 2' }, 
-      { id: '3', label: 'Room 3' }, 
-      ]), 50)
-    );
-
-    setRooms(newRooms);
-    setLoading(false);
-
-    goMain();
   };
 
   const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     goLogin();
+  }
+
+  const redirectExistingSession = async (server, token) => {
+    Wazo.Auth.setHost(server)
+    const refreshToken = localStorage.getItem('refreshToken');
+    try {
+      const existingSession = await Wazo.Auth.validateToken(token, refreshToken);
+      if (existingSession) {
+        goMain();
+      }
+    } catch (error) {
+      console.error('Token validation error', error);
+      return;
+    }
   }
 
   const onRoomChange = newRoom => setRoom(newRoom);
 
-  const value = { page, setPage, login, logout, username, server, goSettings, goMain, rooms, room, onRoomChange, loading };
+  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, room, onRoomChange, loading };
  
   return (
     <WazoContext.Provider value={value}>

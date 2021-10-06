@@ -19,7 +19,11 @@ const config = {
 // extend the theme
 export const theme = extendTheme({ config });
 
-Wazo.Auth.init('woodpecker');
+Wazo.Auth.init('woodpecker', 10);
+Wazo.Auth.setOnRefreshToken((token:string) => { 
+  console.log('bonjour token');
+  localStorage.setItem('token', token);
+ });
 
 export default function App() {
   const [page, setPage] = useState(LOGIN);

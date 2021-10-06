@@ -1,5 +1,9 @@
-import React, { useState, useContext, createContext } from 'react';
+import React, { useState, useEffect, useContext, createContext } from 'react';
+import { useColorMode } from 'native-base';
+
+
 import useSetState from './useSetState';
+import { getStoredValue, removeStoredValue, storeValue } from '../utils';
 
 export const LOGIN = 'page/LOGIN';
 export const SETTINGS = 'page/SETTINGS';
@@ -23,10 +27,23 @@ type WazoContextType = {
 
 export const WazoProvider = ({ value: { page, setPage }, children }) => {
   const [{ username, password, server }, setState] = useSetState({});
-  const [room, setRoom] = useState([]);
+  const { colorMode } = useColorMode();
+
+  const [room, setRoom] = useState('');
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
-  const goSettings = () => setPage(SETTINGS);
+  const [session, setSession] = useState(null);
+
+  const goSettings = async () => {
+    if (!rooms?.length) {
+      console.log('acquiring rooms...');
+      const source = await Wazo.getApiClient().dird.fetchConferenceSource(session.primaryContext());
+      const newRooms = await Wazo.getApiClient().dird.fetchConferenceContacts(source.items[0]);
+      const formattedRooms = newRooms.map(contact => ({ label: contact.name, id: contact.sourceId }));
+      setRooms(formattedRooms);
+    }
+    setPage(SETTINGS);
+  }
   const goMain = () => setPage(MAIN);
   const goLogin = () => setPage(LOGIN);
 
@@ -38,43 +55,51 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
 
     try {
       const newSession = await Wazo.Auth.logIn(loginInput.username, loginInput.password);
+      setSession(newSession);
 
-      localStorage.setItem('token', newSession.token);
-      localStorage.setItem('refreshToken', newSession.refreshToken);
-      localStorage.setItem('server', loginInput.server);
+      storeValue('token', newSession.token);
+      storeValue('refreshToken', newSession.refreshToken);
+      storeValue('server', loginInput.server);
 
-      const newRooms = await new Promise(resolve => setTimeout(() => resolve([
-        { id: '1', label: 'Room 1' }, 
-        { id: '2', label: 'Room 2' }, 
-        { id: '3', label: 'Room 3' }, 
-        ]), 50)
-      );
-  
-      setRooms(newRooms);
-      setLoading(false);
+      setLoading(newSession);
 
-      goMain();
+      onLogin();
     } catch (error) {
-      console.error('Auts error', error);
+      console.error('Auth error', error);
       setLoading(false);
       return;
     }
   };
 
+  const onLogin = () => {
+    const storedRoom = getStoredValue('room');
+    if (storedRoom) {
+      setRoom(storedRoom);
+    }
+
+    if (!storedRoom) {
+      goSettings();
+      return;
+    }
+
+    goMain();
+  }
+
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
+    removeStoredValue('token');
+    removeStoredValue('refreshToken');
     goLogin();
   }
 
   const redirectExistingSession = async (server, token) => {
     Wazo.Auth.setHost(server)
-    const refreshToken = localStorage.getItem('refreshToken');
+    const refreshToken = await getStoredValue('refreshToken');
     try {
       const existingSession = await Wazo.Auth.validateToken(token, refreshToken);
-      if (existingSession) {
-        goMain();
+      if (!existingSession) {
+        return;
       }
+      setSession(existingSession);
     } catch (error) {
       console.error('Token validation error', error);
       return;
@@ -83,8 +108,26 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
 
   const onRoomChange = newRoom => setRoom(newRoom);
 
-  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, room, onRoomChange, loading };
- 
+  useEffect(() => {
+    if (colorMode) {
+      storeValue('colorMode', colorMode);
+    }
+  }, [colorMode])
+
+  useEffect(() => {
+    if (room) {
+      storeValue('room', room);
+    }
+  }, [room])
+
+  useEffect(() => {
+    if (session) {
+      onLogin();
+    }
+  }, [session])
+
+  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, room, onRoomChange, loading, colorMode };
+
   return (
     <WazoContext.Provider value={value}>
       {children}

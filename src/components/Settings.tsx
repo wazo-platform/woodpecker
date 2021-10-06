@@ -5,16 +5,18 @@ import {
   Center,
   Heading,
   Switch,
-  useColorMode,
   VStack,
   Button,
   Select,
   CheckIcon,
+  useColorMode,
 } from "native-base";
 import useWazo from "../hooks/useWazo";
+import { storeValue } from "../utils";
 
 const Main = () => {
   const { goMain, room, rooms, onRoomChange } = useWazo();
+  const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Center
         _dark={{ bg: "blueGray.900" }}
@@ -24,8 +26,23 @@ const Main = () => {
       >
         <VStack space={5} alignItems="center">
           <Heading size="lg">Settings</Heading>
-          <ToggleDarkMode />
-          
+
+          <HStack space={2} alignItems="center">
+            <Text>Dark</Text>
+            <Switch
+              isChecked={colorMode === "light" ? false : true}
+              onToggle={() => {
+                console.log('clide', colorMode);
+                storeValue('colorMode', colorMode)
+                toggleColorMode()
+              }}
+              aria-label={
+                colorMode === "light" ? "switch to dark mode" : "switch to light mode"
+              }
+            />
+            <Text>Light</Text>
+          </HStack>
+
           <Select
             selectedValue={room}
             minWidth="200"
@@ -35,7 +52,7 @@ const Main = () => {
               endIcon: <CheckIcon size="5" />,
             }}
             mt={1}
-            onValueChange={itemValue => onRoomChange(itemValue)}
+            onValueChange={onRoomChange}
           >
             {rooms.map(({ id, label }) => <Select.Item label={label} value={id} key={id} />)}
           </Select>
@@ -43,27 +60,6 @@ const Main = () => {
           <Button onPress={goMain}>Back to Main</Button>
         </VStack>
       </Center>
-  );
-}
-
-// Color Switch Component
-function ToggleDarkMode() {
-  const { colorMode, toggleColorMode } = useColorMode();
-  return (
-    <HStack space={2} alignItems="center">
-      <Text>Dark</Text>
-      <Switch
-        isChecked={colorMode === "light" ? true : false}
-        onToggle={()=> {
-          localStorage.setItem('colorMode', colorMode);
-          toggleColorMode();
-        }}
-        aria-label={
-          colorMode === "light" ? "switch to dark mode" : "switch to light mode"
-        }
-      />
-      <Text>Light</Text>
-    </HStack>
   );
 }
 

@@ -15,6 +15,7 @@ const config = {
   useSystemColorMode: false,
   initialColorMode: "dark",
 };
+const isMobile = typeof navigator != 'undefined' && navigator.product == 'ReactNative';
 
 // extend the theme
 export const theme = extendTheme({ config });
@@ -22,13 +23,15 @@ export const theme = extendTheme({ config });
 Wazo.Auth.init('woodpecker');
 
 // Electron
-if (window.require) {
-  const electron = require('electron');
-  electron.ipcRenderer.on('electron-keyup', (event, message) => {
-    console.log('electron-keyup', message);
-  });
-  electron.ipcRenderer.on('electron-keydown', (event, message) => {
-    console.log('electron-keydown', message);
+if (!isMobile && window.require) {
+  // Trick to avoid requiring electron in mobile
+  System.import('electron').then(electron => {
+    electron.ipcRenderer.on('electron-keyup', (event, message) => {
+      console.log('electron-keyup', message);
+    });
+    electron.ipcRenderer.on('electron-keydown', (event, message) => {
+      console.log('electron-keydown', message);
+    });
   });
 }
 

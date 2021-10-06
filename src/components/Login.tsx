@@ -9,6 +9,33 @@ import {
 } from 'native-base';
 import useWazo from '../hooks/useWazo';
 
+let audio = null;
+
+// Browser not focused
+if (document && navigator.mediaSession) {
+  audio = document.createElement('audio');
+  audio.src = require('../../assets/silence.mp3');
+  audio.loop = true;
+
+  navigator.mediaSession.setActionHandler('play', async function() {
+    console.log('> User clicked "Play" icon.');
+    await audio.play();
+  });
+
+  navigator.mediaSession.setActionHandler('pause', function() {
+    console.log('> User clicked "Pause" icon.');
+    audio.pause();
+  });
+
+  audio.addEventListener('play', function() {
+    navigator.mediaSession.playbackState = 'playing';
+  });
+
+  audio.addEventListener('pause', function() {
+    navigator.mediaSession.playbackState = 'paused';
+  });
+}
+
 const Main = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -18,7 +45,9 @@ const Main = () => {
   const onPress = () => {
     login({ username, password, server });
 
-    audio.play().catch(error => console.log(error));
+    if (audio) {
+      audio.play().catch(error => console.log(error));
+    }
   }
 
   return (

@@ -10,10 +10,8 @@ import Wazo from '@wazo/sdk/lib/simple';
 import useWazo from '../hooks/useWazo';
 import useShortcut from '../hooks/useShortcut';
 
-let room: Wazo.Room;
-
 const Main = () => {
-  const { goSettings, logout, roomNumber } = useWazo();
+  const { goSettings, logout, roomNumber, room, setRoom } = useWazo();
   const [ready, setReady] = useState(false);
   const [talking, setTalking] = useState(false);
   const keyDown = useShortcut('ctrl+j', talking);
@@ -27,35 +25,37 @@ const Main = () => {
   }, [keyDown]);
 
   useEffect(() => {
+    if (!ready) {
+      return;
+    }
     if (talking) {
       room?.unmute();
     } else {
       room?.mute();
     }
-  }, [talking]);
+  }, [talking, ready]);
 
   useEffect(() => {
     (async () => {
-      room = await Wazo.Room.connect({ extension: roomNumber, constraints: { audio: true }, audioOnly: true });
+      const newRoom = await Wazo.Room.connect({ extension: roomNumber });
 
-      room.on(room.ON_JOINED, () => {
-        room.mute();
+      newRoom.on(newRoom.ON_JOINED, () => {
+        newRoom.mute();
         setReady(true);
       });
+
+      setRoom(newRoom);
     })();
 
     window.addEventListener('beforeunload', (event) => {
       if (room) {
         event.preventDefault();
-        // $FlowFixMe
         event.returnValue = '';
-
         return true;
       }
 
       room?.disconnect();
 
-      // $FlowFixMe
       delete event.returnValue;
       return false;
     });
@@ -67,6 +67,7 @@ const Main = () => {
 
   const onLogout = () => {
     room?.disconnect();
+    setRoom(null);
     logout();
   }
 
@@ -80,7 +81,7 @@ const Main = () => {
         flex={1}
       >
         <VStack space={5} alignItems="center">
-          <Heading size="lg">Main</Heading>
+          <Heading size="lg">{ready ? roomNumber : `Connecting to ${roomNumber}...`}</Heading>
           <Button onPress={goSettings}>Settings</Button>
           <Button isDisabled={disabled} onPressIn={() => setTalking(true)} onPressOut={() => setTalking(false)}>
             {talking ? 'Talking': 'Talk'}

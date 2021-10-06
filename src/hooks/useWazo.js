@@ -29,6 +29,7 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
 
   const [roomNumber, setRoomNumber] = useState('');
   const [rooms, setRooms] = useState([]);
+  const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(false);
   const [session, setSession] = useState(null);
 
@@ -103,7 +104,12 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
   }
 
-  const onRoomChange = newRoomNumber => setRoomNumber(newRoomNumber);
+  const onRoomChange = newRoomNumber => {
+    if (room) {
+      room.disconnect();
+    }
+    setRoomNumber(newRoomNumber);
+  }
 
   useEffect(() => {
     if (roomNumber) {
@@ -117,7 +123,7 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
   }, [session])
 
-  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, roomNumber, onRoomChange, loading, setState };
+  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, roomNumber, onRoomChange, loading, setState, room, setRoom };
 
   return (
     <WazoContext.Provider value={value}>

@@ -22,14 +22,14 @@ const config = async () => {
 
 export const theme = extendTheme({ config });
 
-Wazo.Auth.init('woodpecker', 10);
+Wazo.Auth.init('woodpecker');
 Wazo.Auth.setOnRefreshToken((token: string) => {
   storeValue('token', token);
 });
 
 export default function App() {
   const [page, setPage] = useState(LOGIN);
- 
+
   return (
     <WazoProvider value={{ page, setPage }}>
       <NativeBaseProvider theme={theme}>

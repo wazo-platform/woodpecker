@@ -55,6 +55,7 @@ const Main = () => {
             onChangeText={setUsername}
             returnKeyLabel="next"
             returnKeyType="next"
+            onSubmitEditing={onPress}
         />
         <Input
             autoCapitalize="none"
@@ -66,6 +67,7 @@ const Main = () => {
             onChangeText={setPassword}
             returnKeyLabel="next"
             returnKeyType="next"
+            onSubmitEditing={onPress}
         />
         <Input
             autoCapitalize="none"
@@ -77,6 +79,7 @@ const Main = () => {
             onChangeText={setServer}
             returnKeyLabel="send"
             returnKeyType="send"
+            onSubmitEditing={onPress}
         />
         {server ? (<Button onPress={onPress}>Go</Button>) : null}
         {loading && <Text>Loading...</Text>}

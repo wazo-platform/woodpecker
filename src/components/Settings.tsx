@@ -35,9 +35,9 @@ const Main = () => {
               endIcon: <CheckIcon size="5" />,
             }}
             mt={1}
-            onValueChange={itemValue => onRoomChange(itemValue)}
+            onValueChange={onRoomChange}
           >
-            {rooms.map(({ sourceId, name }) => <Select.Item label={name} value={sourceId} key={sourceId} />)}
+            {rooms.map(({ id, label }) => <Select.Item label={label} value={id} key={id} />)}
           </Select>
 
           <Button onPress={goMain}>Back to Main</Button>

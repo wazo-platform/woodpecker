@@ -1,4 +1,4 @@
-import React, { useState, useContext, createContext } from 'react';
+import React, { useState, useEffect, useContext, createContext } from 'react';
 import useSetState from './useSetState';
 
 export const LOGIN = 'page/LOGIN';
@@ -23,7 +23,7 @@ type WazoContextType = {
 
 export const WazoProvider = ({ value: { page, setPage }, children }) => {
   const [{ username, password, server }, setState] = useSetState({});
-  const [room, setRoom] = useState([]);
+  const [room, setRoom] = useState('');
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
   const [session, setSession] = useState(null);
@@ -33,7 +33,8 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
       console.log('acquiring rooms...');
       const source = await Wazo.getApiClient().dird.fetchConferenceSource(session.primaryContext());
       const newRooms = await Wazo.getApiClient().dird.fetchConferenceContacts(source.items[0]);
-      setRooms(newRooms);
+      const formattedRooms = newRooms.map(contact => ({ label: contact.name, id: contact.sourceId }));
+      setRooms(formattedRooms);
     }
     setPage(SETTINGS);
   }
@@ -54,15 +55,24 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
       localStorage.setItem('refreshToken', newSession.refreshToken);
       localStorage.setItem('server', loginInput.server);
 
-      setLoading(false);
+      setLoading(newSession);
 
-      goMain();
+      onLogin();
     } catch (error) {
       console.error('Auts error', error);
       setLoading(false);
       return;
     }
   };
+
+  const onLogin = () => {
+    if (!room) {
+      goSettings();
+      return;
+    }
+
+    goMain();
+  }
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -75,10 +85,10 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     const refreshToken = localStorage.getItem('refreshToken');
     try {
       const existingSession = await Wazo.Auth.validateToken(token, refreshToken);
-      setSession(existingSession);
-      if (existingSession) {
-        goMain();
+      if (!existingSession) {
+        throw new Error('Empty session');
       }
+      setSession(existingSession);
     } catch (error) {
       console.error('Token validation error', error);
       return;
@@ -88,6 +98,12 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
   const onRoomChange = newRoom => setRoom(newRoom);
 
   const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, room, onRoomChange, loading };
+
+  useEffect(() => {
+    if (session) {
+      onLogin();
+    }
+  }, [session])
  
   return (
     <WazoContext.Provider value={value}>

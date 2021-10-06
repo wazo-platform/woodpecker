@@ -29,7 +29,6 @@ const Main = () => {
           <Select
             selectedValue={room}
             minWidth="200"
-            accessibilityLabel="Choose room"
             placeholder="Choose room"
             _selectedItem={{
               bg: "teal.600",

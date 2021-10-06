@@ -34,24 +34,25 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     setState(loginInput);
     setLoading(true);
 
-    const success = await new Promise(resolve => setTimeout(async () => {
+    const success = await new Promise(resolve => setTimeout(() => resolve(true)), 2000);
 
-      const newRooms = await new Promise(roomResolve => setTimeout(() => roomResolve([
-        { id: '1', label: 'Room 1' }, 
-        { id: '2', label: 'Room 2' }, 
-        { id: '3', label: 'Room 3' }, 
-        ]), 50)
-      );
-
-      setRooms(newRooms);
+    if (!success) {
+      console.error('handle authentication error');
       setLoading(false);
-
-      resolve(true);
-    }), 2000);
-
-    if (success) {
-      goMain();
+      return;
     }
+
+    const newRooms = await new Promise(resolve => setTimeout(() => resolve([
+      { id: '1', label: 'Room 1' }, 
+      { id: '2', label: 'Room 2' }, 
+      { id: '3', label: 'Room 3' }, 
+      ]), 50)
+    );
+
+    setRooms(newRooms);
+    setLoading(false);
+
+    goMain();
   };
 
   const logout = () => {

@@ -25,10 +25,9 @@ type WazoContextType = {
 };
 
 export const WazoProvider = ({ value: { page, setPage }, children }) => {
-  const [{ username, password, server }, setState] = useSetState({});
-  const { colorMode } = useColorMode();
+  const [{ username, password, server, colorMode }, setState] = useSetState({});
 
-  const [room, setRoom] = useState('');
+  const [roomNumber, setRoomNumber] = useState('');
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
   const [session, setSession] = useState(null);
@@ -38,7 +37,7 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
       console.log('acquiring rooms...');
       const source = await Wazo.getApiClient().dird.fetchConferenceSource(session.primaryContext());
       const newRooms = await Wazo.getApiClient().dird.fetchConferenceContacts(source.items[0]);
-      const formattedRooms = newRooms.map(contact => ({ label: contact.name, id: contact.sourceId }));
+      const formattedRooms = newRooms.map(contact => ({ label: contact.name, id: `${contact.number}` }));
       setRooms(formattedRooms);
     }
     setPage(SETTINGS);
@@ -71,12 +70,12 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
   };
 
   const onLogin = async () => {
-    const storedRoom = await getStoredValue('room');
-    if (storedRoom) {
-      setRoom(storedRoom);
+    const storedRoomNumber = await getStoredValue('roomNumber');
+    if (storedRoomNumber) {
+      setRoomNumber(`${storedRoomNumber}`);
     }
 
-    if (!storedRoom) {
+    if (!storedRoomNumber) {
       goSettings();
       return;
     }
@@ -105,19 +104,20 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
   }
 
-  const onRoomChange = newRoom => setRoom(newRoom);
+  const onRoomChange = newRoomNumber => setRoomNumber(newRoomNumber);
 
   useEffect(() => {
     if (colorMode) {
+      console.log('setting mode', colorMode);
       storeValue('colorMode', colorMode);
     }
   }, [colorMode])
 
   useEffect(() => {
-    if (room) {
-      storeValue('room', room);
+    if (roomNumber) {
+      storeValue('roomNumber', roomNumber);
     }
-  }, [room])
+  }, [roomNumber])
 
   useEffect(() => {
     if (session) {
@@ -125,7 +125,7 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
   }, [session])
 
-  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, room, onRoomChange, loading, colorMode };
+  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, roomNumber, onRoomChange, loading, colorMode, setState };
 
   return (
     <WazoContext.Provider value={value}>

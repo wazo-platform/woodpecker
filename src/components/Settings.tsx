@@ -12,9 +12,10 @@ import {
   useColorMode,
 } from "native-base";
 import useWazo from "../hooks/useWazo";
+import { storeValue } from "../utils";
 
 const Main = () => {
-  const { goMain, room, rooms, onRoomChange } = useWazo();
+  const { goMain, roomId, rooms, onRoomChange, setState } = useWazo();
   const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Center
@@ -29,10 +30,12 @@ const Main = () => {
           <HStack space={2} alignItems="center">
             <Text>Dark</Text>
             <Switch
-              isChecked={colorMode === "light" ? false : true}
-              onToggle={() => {
-                console.log('clide', colorMode);
-                toggleColorMode()
+              isChecked={colorMode === "light" ? true : false}
+              onToggle={async () => {
+                if (colorMode) {
+                  await storeValue('colorMode', colorMode)
+                }
+                toggleColorMode();
               }}
               aria-label={
                 colorMode === "light" ? "switch to dark mode" : "switch to light mode"
@@ -42,7 +45,7 @@ const Main = () => {
           </HStack>
 
           <Select
-            selectedValue={room}
+            selectedValue={roomId}
             minWidth="200"
             placeholder="Choose room"
             _selectedItem={{
@@ -55,7 +58,7 @@ const Main = () => {
             {rooms.map(({ id, label }) => <Select.Item label={label} value={id} key={id} />)}
           </Select>
 
-          <Button onPress={goMain}>Back to Main</Button>
+          <Button onPress={goMain}>Back to Main ({roomId})</Button>
         </VStack>
       </Center>
   );

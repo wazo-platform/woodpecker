@@ -29,6 +29,10 @@ const Main = () => {
   useEffect(() => {
     (async () => {
       const server = await getStoredValue('server');
+      if (server){
+        setServer(server);
+      }
+      
       const token = await getStoredValue('token');
 
       if (server && token) {

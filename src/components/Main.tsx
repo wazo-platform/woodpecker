@@ -13,7 +13,7 @@ import useShortcut from '../hooks/useShortcut';
 let room: Wazo.Room;
 
 const Main = () => {
-  const { goSettings, logout } = useWazo();
+  const { goSettings, logout, roomNumber } = useWazo();
   const [ready, setReady] = useState(false);
   const [talking, setTalking] = useState(false);
   const keyDown = useShortcut('ctrl+j', talking);
@@ -36,7 +36,7 @@ const Main = () => {
 
   useEffect(() => {
     (async () => {
-      room = await Wazo.Room.connect({ extension: '9000', constraints: { audio: true }, audioOnly: true });
+      room = await Wazo.Room.connect({ extension: roomNumber, constraints: { audio: true }, audioOnly: true });
 
       room.on(room.ON_JOINED, () => {
         room.mute();

@@ -14,9 +14,8 @@ import {
 import useWazo from "../hooks/useWazo";
 
 const Main = () => {
-  const { goMain, room, rooms, onRoomChange } = useWazo();
+  const { goMain, room, rooms, onRoomChange, setState } = useWazo();
   const { colorMode, toggleColorMode } = useColorMode();
-  console.log(colorMode)
   return (
     <Center
         _dark={{ bg: "blueGray.900" }}
@@ -30,10 +29,10 @@ const Main = () => {
           <HStack space={2} alignItems="center">
             <Text>Dark</Text>
             <Switch
-              isChecked={colorMode === "light" ? false : true}
+              isChecked={colorMode === "light" ? true : false}
               onToggle={() => {
-                console.log('clide', colorMode);
                 toggleColorMode()
+                setState({ colorMode: colorMode === 'light' ? 'dark' : 'light' })
               }}
               aria-label={
                 colorMode === "light" ? "switch to dark mode" : "switch to light mode"

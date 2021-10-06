@@ -1,14 +1,21 @@
-import React from "react";
+import React, { useEffect } from 'react';
 import {
   Button,
   Center,
   Heading,
   VStack,
-} from "native-base";
-import useWazo from "../hooks/useWazo";
+} from 'native-base';
+import useWazo from '../hooks/useWazo';
+import useShortcut from '../hooks/useShortcut';
 
 const Main = () => {
   const { goSettings, logout } = useWazo();
+  const keyDown = useShortcut('ctrl+j');
+
+  useEffect(() => {
+
+  }, [keyDown]);
+
   return (
     <Center
         _dark={{ bg: "blueGray.900" }}

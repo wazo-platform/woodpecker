@@ -10,6 +10,7 @@ import {
   Select,
   CheckIcon,
   useColorMode,
+  Box,
 } from "native-base";
 import useWazo from "../hooks/useWazo";
 import { storeValue } from "../utils";
@@ -18,7 +19,12 @@ const Main = () => {
   const { goMain, roomNumber, rooms, onRoomChange } = useWazo();
   const { colorMode, toggleColorMode } = useColorMode();
   return (
-    <Center
+    <Box flex={1} bg="white" safeAreaBottom>
+      <HStack bg="indigo.600" alignItems="center" safeAreaTop shadow={6}>
+        <Button variant="ghost" onPress={goMain}>Back</Button>
+      </HStack>
+
+      <Center
         _dark={{ bg: "blueGray.900" }}
         _light={{ bg: "blueGray.50" }}
         px={4}
@@ -58,9 +64,9 @@ const Main = () => {
             {rooms.map(({ id, label }) => <Select.Item label={label} value={id} key={id} />)}
           </Select>
 
-          <Button onPress={goMain}>Back to Main</Button>
         </VStack>
       </Center>
+    </Box>
   );
 }
 

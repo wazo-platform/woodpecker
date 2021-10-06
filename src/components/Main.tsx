@@ -4,6 +4,8 @@ import {
   Center,
   Heading,
   VStack,
+  HStack,
+  Box,
 } from 'native-base';
 import Wazo from '@wazo/sdk/lib/simple';
 
@@ -73,21 +75,24 @@ const Main = () => {
   const disabled = !ready;
 
   return (
-    <Center
+    <Box flex={1} bg="white" safeAreaTop>
+      <Center
         _dark={{ bg: "blueGray.900" }}
         _light={{ bg: "blueGray.50" }}
         px={4}
         flex={1}
       >
         <VStack space={5} alignItems="center">
-          <Heading size="lg">Main</Heading>
-          <Button onPress={goSettings}>Settings</Button>
           <Button isDisabled={disabled} onPressIn={() => setTalking(true)} onPressOut={() => setTalking(false)}>
             {talking ? 'Talking': 'Talk'}
           </Button>
-          <Button onPress={onLogout}>Logout</Button>
         </VStack>
       </Center>
+      <HStack bg="indigo.600" alignItems="center" safeAreaBottom shadow={6}>
+        <Button variant="ghost" onPress={goSettings}>Settings</Button>
+        <Button variant="ghost" onPress={onLogout}>Logout</Button>
+      </HStack>
+    </Box>
   );
 }
 

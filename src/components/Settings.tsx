@@ -15,7 +15,7 @@ import useWazo from "../hooks/useWazo";
 import { storeValue } from "../utils";
 
 const Main = () => {
-  const { goMain, roomId, rooms, onRoomChange, setState } = useWazo();
+  const { goMain, roomNumber, rooms, onRoomChange } = useWazo();
   const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Center
@@ -45,7 +45,7 @@ const Main = () => {
           </HStack>
 
           <Select
-            selectedValue={roomId}
+            selectedValue={roomNumber}
             minWidth="200"
             placeholder="Choose room"
             _selectedItem={{
@@ -58,7 +58,7 @@ const Main = () => {
             {rooms.map(({ id, label }) => <Select.Item label={label} value={id} key={id} />)}
           </Select>
 
-          <Button onPress={goMain}>Back to Main ({roomId})</Button>
+          <Button onPress={goMain}>Back to Main</Button>
         </VStack>
       </Center>
   );

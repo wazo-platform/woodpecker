@@ -7,9 +7,9 @@
     "ios": "react-native run-ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "electron": "expo-electron start",
     "build": "yarn electron-webpack && yarn electron-builder --dir -c.compression=store -c.mac.identity=null"
   },
+  "main": "electron/main/index.js",
   "build": {
     "extraMetadata": {
       "main": "main.js"

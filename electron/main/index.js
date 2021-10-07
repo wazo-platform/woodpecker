@@ -1,9 +1,8 @@
 'use strict';
-
-import { app, BrowserWindow } from 'electron';
-import * as path from 'path';
-import { format as formatUrl } from 'url';
-// import ioHook from 'iohook';
+const path = require('path');
+const { app, BrowserWindow } = require('electron');
+const { format: formatUrl } = require('url');
+// const ioHook = require('iohook');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -14,7 +13,7 @@ const createMainWindow = () => {
   const browserWindow = new BrowserWindow({ webPreferences: { nodeIntegration: true } });
 
   if (isDevelopment) {
-    browserWindow.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`);
+    browserWindow.loadURL(`http://localhost:19006`);
   } else {
     browserWindow.loadURL(
       formatUrl({

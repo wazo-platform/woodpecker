@@ -13,77 +13,9 @@ import Wazo from '@wazo/sdk/lib/simple';
 import { AntDesign } from "@expo/vector-icons"
 
 import useWazo from '../hooks/useWazo';
-import useShortcut from '../hooks/useShortcut';
 
 const Main = () => {
-  const { goSettings, logout, roomNumber, room, setRoom } = useWazo();
-  const [ready, setReady] = useState(false);
-  const [talking, setTalking] = useState(false);
-  const keyDown = useShortcut('ctrl+j', talking);
-
-  useEffect(() => {
-    if (keyDown) {
-      setTalking(true);
-    } else {
-      setTalking(false);
-    }
-  }, [keyDown]);
-
-  useEffect(() => {
-    if (!ready) {
-      return;
-    }
-    if (talking) {
-      room?.unmute();
-    } else {
-      room?.mute();
-    }
-  }, [talking, ready]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const newRoom = await Wazo.Room.connect({ extension: roomNumber });
-        console.log('newRoom', newRoom);
-
-        newRoom.on(newRoom.ON_JOINED, () => {
-          newRoom.mute();
-          setReady(true);
-        });
-
-        setRoom(newRoom);
-      } catch(e) {
-        console.log('e', e);
-      }
-
-    })();
-
-    if (typeof window !== 'undefined' && window.addEventListener) {
-      window.addEventListener('beforeunload', (event) => {
-        if (room) {
-          event.preventDefault();
-          event.returnValue = '';
-          return true;
-        }
-
-        room?.disconnect();
-
-        delete event.returnValue;
-        return false;
-      });
-
-      window.addEventListener('unload', () => {
-        room?.disconnect();
-      });
-    }
-  }, []);
-
-  const onLogout = () => {
-    room?.disconnect();
-    setRoom(null);
-    logout();
-  }
-
+  const { goSettings, logout, roomNumber, talking, ready, setTalking } = useWazo();
   const disabled = !ready;
 
   return (
@@ -109,7 +41,7 @@ const Main = () => {
         />
         <IconButton
           variant="ghost"
-          onPress={onLogout}
+          onPress={logout}
           icon={<Icon size="md" as={<AntDesign name="logout" />} color="white" />}
         />
       </HStack>

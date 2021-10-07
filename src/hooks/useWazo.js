@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, createContext } from 'react';
 import { useColorMode } from 'native-base';
 
 import useSetState from './useSetState';
+import useShortcut from '../hooks/useShortcut';
 import { getStoredValue, removeStoredValue, storeValue, isMobile } from '../utils';
 
 export const LOGIN = 'page/LOGIN';
@@ -56,6 +57,10 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
   const [loading, setLoading] = useState(false);
   const [session, setSession] = useState(null);
 
+  const [ready, setReady] = useState(false);
+  const [talking, setTalking] = useState(false);
+  const keyDown = useShortcut('ctrl+j', talking);
+
   const goSettings = async () => {
     if (!rooms?.length) {
       console.log('acquiring rooms...');
@@ -66,7 +71,53 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
     setPage(SETTINGS);
   }
-  const goMain = () => setPage(MAIN);
+
+  const connectToRoom = async () => {
+    if (room) {
+      return;
+    }
+
+    console.log('connecting to room...');
+
+    try {
+      const newRoom = await Wazo.Room.connect({ extension: roomNumber });
+      console.log('newRoom', newRoom);
+
+      newRoom.on(newRoom.ON_JOINED, () => {
+        newRoom.mute();
+        setReady(true);
+      });
+
+      setRoom(newRoom);
+    } catch(e) {
+      console.log('e', e);
+    }
+
+    if (typeof window !== 'undefined' && window.addEventListener) {
+      window.addEventListener('beforeunload', (event) => {
+        if (room) {
+          event.preventDefault();
+          event.returnValue = '';
+          return true;
+        }
+
+        room?.disconnect();
+
+        delete event.returnValue;
+        return false;
+      });
+
+      window.addEventListener('unload', () => {
+        room?.disconnect();
+      });
+    }
+  }
+
+  const goMain = () => {
+    connectToRoom();    
+    setPage(MAIN);
+  }
+
   const goLogin = () => setPage(LOGIN);
 
   const login = async (loginInput: LoginInput) => {
@@ -107,6 +158,8 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
   }
 
   const logout = () => {
+    room?.disconnect();
+    setRoom(null);
     removeStoredValue('token');
     removeStoredValue('refreshToken');
     goLogin();
@@ -146,7 +199,28 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
   }, [session])
 
-  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, roomNumber, onRoomChange, loading, setState, room, setRoom };
+  /////////// Imported from Main
+  useEffect(() => {
+    if (keyDown) {
+      setTalking(true);
+    } else {
+      setTalking(false);
+    }
+  }, [keyDown]);
+
+  useEffect(() => {
+    if (!ready) {
+      return;
+    }
+    if (talking) {
+      room?.unmute();
+    } else {
+      room?.mute();
+    }
+  }, [talking, ready]);
+  ///////////
+
+  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, roomNumber, onRoomChange, loading, setState, room, setRoom, talking, ready, setTalking };
 
   return (
     <WazoContext.Provider value={value}>

@@ -2,7 +2,7 @@
 const path = require('path');
 const { app, BrowserWindow } = require('electron');
 const { format: formatUrl } = require('url');
-// const ioHook = require('iohook');
+const ioHook = require('iohook');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 

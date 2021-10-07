@@ -17,14 +17,6 @@ type LoginInput = {
   server: string,
 };
 
-type WazoContextType = {
-  page: string,
-  setPage: Function,
-  login: Function,
-  username: string,
-  server: string,
-};
-
 // Polyfill webrtc
 if (isMobile) {
   const MediaStreamTrackEvent = require('react-native-webrtc/src/MediaStreamTrackEvent').default;
@@ -61,36 +53,29 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
   const [talking, setTalking] = useState(false);
   const keyDown = useShortcut('ctrl+j', talking);
 
-  const goSettings = async () => {
-    if (!rooms?.length) {
-      console.log('acquiring rooms...');
-      const source = await Wazo.getApiClient().dird.fetchConferenceSource(session.primaryContext());
-      const newRooms = await Wazo.getApiClient().dird.fetchConferenceContacts(source.items[0]);
-      const formattedRooms = newRooms.map(contact => ({ label: contact.name, id: `${contact.number}` }));
-      setRooms(formattedRooms);
-    }
-    setPage(SETTINGS);
-  }
+  const goSettings = async () => setPage(SETTINGS);
+  const goMain = () => setPage(MAIN);
+  const goLogin = () => setPage(LOGIN);
 
   const connectToRoom = async () => {
-    if (room) {
+    if (room || !roomNumber) {
       return;
     }
 
-    console.log('connecting to room...');
+    console.log('connecting to room', roomNumber);
 
     try {
       const newRoom = await Wazo.Room.connect({ extension: roomNumber });
-      console.log('newRoom', newRoom);
-
+      
       newRoom.on(newRoom.ON_JOINED, () => {
+        console.log('joined the room');
         newRoom.mute();
         setReady(true);
       });
 
       setRoom(newRoom);
     } catch(e) {
-      console.log('e', e);
+      console.error('e', e);
     }
 
     if (typeof window !== 'undefined' && window.addEventListener) {
@@ -112,13 +97,6 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
       });
     }
   }
-
-  const goMain = () => {
-    connectToRoom();    
-    setPage(MAIN);
-  }
-
-  const goLogin = () => setPage(LOGIN);
 
   const login = async (loginInput: LoginInput) => {
     setState(loginInput);
@@ -180,11 +158,23 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
   }
 
-  const onRoomChange = newRoomNumber => {
+  const changeRoomNumber = newRoomNumber => {
     if (room) {
       room.disconnect();
     }
     setRoomNumber(newRoomNumber);
+  }
+
+  const loadRooms = async () => {
+    // bad testing, too lazy
+    if (rooms.length) {
+      return;
+    }
+    console.log('acquiring rooms...');
+    const source = await Wazo.getApiClient().dird.fetchConferenceSource(session.primaryContext());
+    const newRooms = await Wazo.getApiClient().dird.fetchConferenceContacts(source.items[0]);
+    const formattedRooms = newRooms.map(contact => ({ label: contact.name, id: `${contact.number}` }));
+    setRooms(formattedRooms);
   }
 
   useEffect(() => {
@@ -199,7 +189,6 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
   }, [session])
 
-  /////////// Imported from Main
   useEffect(() => {
     if (keyDown) {
       setTalking(true);
@@ -218,9 +207,26 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
       room?.mute();
     }
   }, [talking, ready]);
-  ///////////
 
-  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, roomNumber, onRoomChange, loading, setState, room, setRoom, talking, ready, setTalking };
+  useEffect(() => {
+    switch (page) {
+      case LOGIN:
+        break;
+
+      case MAIN:
+        connectToRoom();
+        break;
+
+      case SETTINGS:
+        loadRooms();
+        break;
+      
+      default: 
+        console.error('this page does not exist');
+    }
+  }, [page])
+
+  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, roomNumber, changeRoomNumber, loading, setState, room, setRoom, talking, ready, setTalking };
 
   return (
     <WazoContext.Provider value={value}>

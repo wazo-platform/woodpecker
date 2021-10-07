@@ -42,14 +42,20 @@ const Main = () => {
 
   useEffect(() => {
     (async () => {
-      const newRoom = await Wazo.Room.connect({ extension: roomNumber });
+      try {
+        const newRoom = await Wazo.Room.connect({ extension: roomNumber });
+        console.log('newRoom', newRoom);
 
-      newRoom.on(newRoom.ON_JOINED, () => {
-        newRoom.mute();
-        setReady(true);
-      });
+        newRoom.on(newRoom.ON_JOINED, () => {
+          newRoom.mute();
+          setReady(true);
+        });
 
-      setRoom(newRoom);
+        setRoom(newRoom);
+      } catch(e) {
+        console.log('e', e);
+      }
+
     })();
 
     if (typeof window !== 'undefined' && window.addEventListener) {
@@ -90,7 +96,6 @@ const Main = () => {
       >
         <VStack space={5} alignItems="center">
           <Heading size="lg">{ready ? roomNumber : `Connecting to ${roomNumber}...`}</Heading>
-          <Button onPress={goSettings}>Settings</Button>
           <Button size="lg" isDisabled={disabled} onPressIn={() => setTalking(true)} onPressOut={() => setTalking(false)}>
             {talking ? 'Talking': 'Talk'}
           </Button>

@@ -20,7 +20,7 @@ import useWazo from "../hooks/useWazo";
 import { storeValue } from "../utils";
 
 const Main = () => {
-  const { goMain, roomNumber, rooms, onRoomChange } = useWazo();
+  const { goMain, roomNumber, rooms, changeRoomNumber } = useWazo();
   const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Box flex={1} bg="white" safeAreaBottom>
@@ -67,7 +67,7 @@ const Main = () => {
               endIcon: <CheckIcon size="5" />,
             }}
             mt={1}
-            onValueChange={onRoomChange}
+            onValueChange={changeRoomNumber}
           >
             {rooms.map(({ id, label }) => <Select.Item label={label} value={id} key={id} />)}
           </Select>

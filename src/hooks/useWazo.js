@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, createContext } from 'react';
 import { useColorMode } from 'native-base';
 
 import useSetState from './useSetState';
+import useShortcut from '../hooks/useShortcut';
 import { getStoredValue, removeStoredValue, storeValue, isMobile } from '../utils';
 
 export const LOGIN = 'page/LOGIN';
@@ -13,14 +14,6 @@ const WazoContext = createContext({});
 type LoginInput = {
   username: string,
   password: string,
-  server: string,
-};
-
-type WazoContextType = {
-  page: string,
-  setPage: Function,
-  login: Function,
-  username: string,
   server: string,
 };
 
@@ -56,18 +49,54 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
   const [loading, setLoading] = useState(false);
   const [session, setSession] = useState(null);
 
-  const goSettings = async () => {
-    if (!rooms?.length) {
-      console.log('acquiring rooms...');
-      const source = await Wazo.getApiClient().dird.fetchConferenceSource(session.primaryContext());
-      const newRooms = await Wazo.getApiClient().dird.fetchConferenceContacts(source.items[0]);
-      const formattedRooms = newRooms.map(contact => ({ label: contact.name, id: `${contact.number}` }));
-      setRooms(formattedRooms);
-    }
-    setPage(SETTINGS);
-  }
+  const [ready, setReady] = useState(false);
+  const [talking, setTalking] = useState(false);
+  const keyDown = useShortcut('ctrl+j', talking);
+
+  const goSettings = async () => setPage(SETTINGS);
   const goMain = () => setPage(MAIN);
   const goLogin = () => setPage(LOGIN);
+
+  const connectToRoom = async () => {
+    if (room || !roomNumber) {
+      return;
+    }
+
+    console.log('connecting to room', roomNumber);
+
+    try {
+      const newRoom = await Wazo.Room.connect({ extension: roomNumber });
+      
+      newRoom.on(newRoom.ON_JOINED, () => {
+        console.log('joined the room');
+        newRoom.mute();
+        setReady(true);
+      });
+
+      setRoom(newRoom);
+    } catch(e) {
+      console.error('e', e);
+    }
+
+    if (typeof window !== 'undefined' && window.addEventListener) {
+      window.addEventListener('beforeunload', (event) => {
+        if (room) {
+          event.preventDefault();
+          event.returnValue = '';
+          return true;
+        }
+
+        room?.disconnect();
+
+        delete event.returnValue;
+        return false;
+      });
+
+      window.addEventListener('unload', () => {
+        room?.disconnect();
+      });
+    }
+  }
 
   const login = async (loginInput: LoginInput) => {
     setState(loginInput);
@@ -107,6 +136,8 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
   }
 
   const logout = () => {
+    room?.disconnect();
+    setRoom(null);
     removeStoredValue('token');
     removeStoredValue('refreshToken');
     goLogin();
@@ -127,11 +158,23 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
   }
 
-  const onRoomChange = newRoomNumber => {
+  const changeRoomNumber = newRoomNumber => {
     if (room) {
       room.disconnect();
     }
     setRoomNumber(newRoomNumber);
+  }
+
+  const loadRooms = async () => {
+    // bad testing, too lazy
+    if (rooms.length) {
+      return;
+    }
+    console.log('acquiring rooms...');
+    const source = await Wazo.getApiClient().dird.fetchConferenceSource(session.primaryContext());
+    const newRooms = await Wazo.getApiClient().dird.fetchConferenceContacts(source.items[0]);
+    const formattedRooms = newRooms.map(contact => ({ label: contact.name, id: `${contact.number}` }));
+    setRooms(formattedRooms);
   }
 
   useEffect(() => {
@@ -146,7 +189,44 @@ export const WazoProvider = ({ value: { page, setPage }, children }) => {
     }
   }, [session])
 
-  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, roomNumber, onRoomChange, loading, setState, room, setRoom };
+  useEffect(() => {
+    if (keyDown) {
+      setTalking(true);
+    } else {
+      setTalking(false);
+    }
+  }, [keyDown]);
+
+  useEffect(() => {
+    if (!ready) {
+      return;
+    }
+    if (talking) {
+      room?.unmute();
+    } else {
+      room?.mute();
+    }
+  }, [talking, ready]);
+
+  useEffect(() => {
+    switch (page) {
+      case LOGIN:
+        break;
+
+      case MAIN:
+        connectToRoom();
+        break;
+
+      case SETTINGS:
+        loadRooms();
+        break;
+      
+      default: 
+        console.error('this page does not exist');
+    }
+  }, [page])
+
+  const value = { page, setPage, login, logout, redirectExistingSession, username, server, goSettings, goMain, rooms, roomNumber, changeRoomNumber, loading, setState, room, setRoom, talking, ready, setTalking };
 
   return (
     <WazoContext.Provider value={value}>

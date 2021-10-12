@@ -8,82 +8,30 @@ import {
   Box,
   IconButton,
   Icon,
+  Text,
 } from 'native-base';
 import Wazo from '@wazo/sdk/lib/simple';
-import { AntDesign } from "@expo/vector-icons"
+import { AntDesign, Entypo } from "@expo/vector-icons"
 
 import useWazo from '../hooks/useWazo';
-import useShortcut from '../hooks/useShortcut';
+
+const buttonStyle = disabled => ({
+  background: 'transparent',
+  pointerEvents: disabled ? 'none' : 'auto'
+});
+
+const iconStyle = (talking, disabled) => ({
+  width: 320,
+  height: 320,
+  lineHeight: 320,
+  fontSize: 320,
+  color: talking ? '#9c0' : disabled ? '#ccc' : '#6bd',
+  textShadow: talking || disabled ? 'none' : '0 10px 20px rgba(0,0,0,.3)',
+  background: 'transparent',
+});
 
 const Main = () => {
-  const { goSettings, logout, roomNumber, room, setRoom } = useWazo();
-  const [ready, setReady] = useState(false);
-  const [talking, setTalking] = useState(false);
-  const keyDown = useShortcut('ctrl+j', talking);
-
-  useEffect(() => {
-    if (keyDown) {
-      setTalking(true);
-    } else {
-      setTalking(false);
-    }
-  }, [keyDown]);
-
-  useEffect(() => {
-    if (!ready) {
-      return;
-    }
-    if (talking) {
-      room?.unmute();
-    } else {
-      room?.mute();
-    }
-  }, [talking, ready]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const newRoom = await Wazo.Room.connect({ extension: roomNumber });
-        console.log('newRoom', newRoom);
-
-        newRoom.on(newRoom.ON_JOINED, () => {
-          newRoom.mute();
-          setReady(true);
-        });
-
-        setRoom(newRoom);
-      } catch(e) {
-        console.log('e', e);
-      }
-
-    })();
-
-    if (typeof window !== 'undefined' && window.addEventListener) {
-      window.addEventListener('beforeunload', (event) => {
-        if (room) {
-          event.preventDefault();
-          event.returnValue = '';
-          return true;
-        }
-
-        room?.disconnect();
-
-        delete event.returnValue;
-        return false;
-      });
-
-      window.addEventListener('unload', () => {
-        room?.disconnect();
-      });
-    }
-  }, []);
-
-  const onLogout = () => {
-    room?.disconnect();
-    setRoom(null);
-    logout();
-  }
-
+  const { goSettings, logout, roomNumber, talking, ready, setTalking } = useWazo();
   const disabled = !ready;
 
   return (
@@ -94,11 +42,17 @@ const Main = () => {
         px={4}
         flex={1}
       >
-        <VStack space={5} alignItems="center">
+        <VStack space={5} alignItems="center" justifyContent="center">
           <Heading size="lg">{ready ? roomNumber : `Connecting to ${roomNumber}...`}</Heading>
-          <Button size="lg" isDisabled={disabled} onPressIn={() => setTalking(true)} onPressOut={() => setTalking(false)}>
-            {talking ? 'Talking': 'Talk'}
-          </Button>
+
+          <IconButton
+            variant="ghost"
+            onPressIn={() => setTalking(true)}
+            onPressOut={() => setTalking(false)}
+            style={buttonStyle(disabled)}
+            icon={<Icon as={<Entypo name="flickr-with-circle" />} color="black" style={iconStyle(talking, disabled)} />}
+          />
+
         </VStack>
       </Center>
       <HStack bg="indigo.600" justifyContent="flex-end" alignItems="center" safeAreaBottom shadow={6} space="sm" style={{ height: 60}}>
@@ -109,7 +63,7 @@ const Main = () => {
         />
         <IconButton
           variant="ghost"
-          onPress={onLogout}
+          onPress={logout}
           icon={<Icon size="md" as={<AntDesign name="logout" />} color="white" />}
         />
       </HStack>
